@@ -1,0 +1,5 @@
+message Application {
+  optional type string = 1;
+  required version string = 2;
+  required payload bytes = 3;
+}
