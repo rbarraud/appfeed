@@ -25,7 +25,7 @@ module.exports = function (args) {
   var keyfile = path.resolve(process.cwd(), defined(
     process.env.APPFEED_KEYFILE,
     argv.keyfile,
-    path.join(home, '.config', 'appfeed.json')
+    path.join(home, '.config/appfeed/keys.json')
   ))
   mkdirp.sync(dbdir)
   mkdirp.sync(blobdir)
@@ -68,8 +68,6 @@ module.exports = function (args) {
         else showHash(feed, hash)
       })
     } else showHash(feed, argv._[1])
-  } else if (argv._[0] === 'server') {
-    // ...
   } else if (argv._[0] === 'publish') {
     var feed = getFeed()
     process.stdin.pipe(feed.publish(argv, function (err, node) {

@@ -1,7 +1,25 @@
-appfeed publish OPTIONS
-appfeed server OPTIONS
+appfeed generate
+
+  Generate a keypair for signing application releases.
+
+appfeed id
+
+  Print the public key.
+
+appfeed versions
+
+  Print a list of versions with their hashes.
+
+appfeed show REF
+
+  Print the contents of REF, a version or hash.
+
+appfeed publish --version=VERSION
+
+  Publish data from stdin as VERSION.
 
 OPTIONS are:
 
-  --dir -d  Where to save the appfeed data
+  --dir -d      Where to save the appfeed data
+  --keyfile -k  Use this keyfile. Default: ~/.config/appfeed/keys.json
 
