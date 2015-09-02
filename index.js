@@ -4,6 +4,8 @@ var hsodium = require('hyperlog-sodium')
 var xtend = require('xtend')
 var exchange = require('./exchange.js')
 var sub = require('subleveldown')
+var semver = require('semver')
+var Writable = require('readable-stream/writable')
 
 module.exports = Appfeed
 
@@ -29,7 +31,7 @@ function Appfeed (db, sodium, opts) {
       cb(null, sodium.crypto_sign(bkey, keypair.secretKey))
     }
   }))
-  self._store = opts.store
+  self.store = opts.store
 }
 
 Appfeed.prototype.replicate = function (opts, cb) {
@@ -65,14 +67,14 @@ Appfeed.prototype.replicate = function (opts, cb) {
   return mux
  
   function replicate (keys, cb) {
-    var ex = exchange(self._store)
+    var ex = exchange(self.store)
     ex.pipe(mux.createSharedStream('exchange')).pipe(ex)
  
     var pending = 1
     keys.forEach(function (key) {
       pending ++
       ex.createReadStream(key)
-        .pipe(self._store.createWriteStream(key))
+        .pipe(self.store.createWriteStream(key))
         .on('finish', done)
     })
     done()
@@ -91,15 +93,21 @@ Appfeed.prototype.revoke = function (id, cb) {
 Appfeed.prototype.publish = function (doc, cb) {
   var self = this
   if (!cb) cb = noop
-  if (!doc.version) throw new Error('doc.version not provided')
+  if (!doc.version) return error('doc.version not provided')
   if (typeof doc.version !== 'string') {
-    throw new Error('doc.version must be a string')
+    return error('doc.version must be a string')
+  } else if (!semver.valid(doc.version)) {
+    return error('invalid semver')
   }
- 
-  return self._store.createWriteStream(function (err, w) {
+  return self.store.createWriteStream(function (err, w) {
     doc.key = w.key
     self.versions.append(doc, cb)
   })
+  function error (msg) {
+    var err = new Error(msg)
+    process.nextTick(function () { cb(err) })
+    return new Writable
+  }
 }
 
 function noop () {}
