@@ -82,6 +82,16 @@ module.exports = function (args) {
         console.log(id.toString('hex'))
       })
     })
+  } else if (argv._[0] === 'trust') {
+    var feed = getFeed()
+    feed.trust(argv._[1], function (err) {
+      if (err) fail(err)
+    })
+  } else if (argv._[0] === 'revoke') {
+    var feed = getFeed()
+    feed.revoke(argv._[1], function (err) {
+      if (err) fail(err)
+    })
   } else return false
  
   function getFeed () {
