@@ -69,7 +69,7 @@ Appfeed.prototype.replicate = function (opts, cb) {
         if (err) cb(err)
         else replicate(rows.map(keyof), cb)
       })
-    } else cb(null)
+    }
   }
  
   function replicate (keys, cb) {
