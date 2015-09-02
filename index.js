@@ -12,6 +12,8 @@ module.exports = Appfeed
 function Appfeed (db, sodium, opts) {
   var self = this
   if (!(self instanceof Appfeed)) return new Appfeed(db, sodium, opts)
+  if (sodium.api) sodium = sodium.api
+ 
   if (!opts) opts = {}
   var keypair = {
     secretKey: typeof opts.secretKey === 'string'
@@ -37,34 +39,38 @@ function Appfeed (db, sodium, opts) {
 Appfeed.prototype.replicate = function (opts, cb) {
   var self = this
   if (!opts) opts = {}
+  if (typeof opts === 'function') {
+    cb = opts
+    opts = {}
+  }
   if (!cb) cb = noop
  
   var mux = multiplex()
-  if (opts.trust !== false) {
-    var tstream = self._trust.replicate()
-    tstream.pipe(mux.createStream('trust')).pipe(tstream)
-  }
-  if (opts.versions !== false) {
+  var tstream = self._trust.replicate()
+  tstream.pipe(mux.createStream('trust')).pipe(tstream)
+
+  tstream.once('finish', function () {
     var astream = self.versions.replicate()
     astream.pipe(mux.createStream('versions')).pipe(astream)
-  }
- 
-  if (opts.heads) {
-    if (astream) astream.once('finish', function () {
+    astream.once('finish', function () { fetchApps() })
+  })
+  return mux
+
+  function fetchApps () {
+    if (opts.blobs === false) {
+      cb(null)
+    } else if (opts.heads) {
       self.versions.heads(function (err, heads) {
         if (err) return cb(err)
         else replicate(heads.map(keyof), cb)
       })
-    })
-  } else if (opts.full !== false) {
-    if (astream) astream.once('finish', function () {
+    } else {
       collect(self.versions.createReadStream(), function (err, rows) {
         if (err) cb(err)
         else replicate(rows.map(keyof), cb)
       })
-    })
+    } else cb(null)
   }
-  return mux
  
   function replicate (keys, cb) {
     var ex = exchange(self.store)
