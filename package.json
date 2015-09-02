@@ -1,9 +1,11 @@
 {
   "name": "appfeed",
   "version": "1.0.0",
-  "description": "",
+  "description": "version feed for trusted application delivery",
   "main": "index.js",
-  "bin": "bin/cmd.js",
+  "bin": {
+    "appfeed": "bin/cmd.js"
+  },
   "dependencies": {
     "content-addressable-blob-store ": "^4.2.1",
     "defined ": "~0.0.0",
@@ -20,7 +22,7 @@
     "subleveldown ": "^2.0.0",
     "through2 ": "^2.0.0",
     "trust-log ": "^1.0.0",
-    "xtend": "2.1.2"
+    "xtend": "^2.1.2"
   },
   "devDependencies": {
     "tape": "^4.0.0"
@@ -29,5 +31,27 @@
     "test": "tape test/*.js"
   },
   "author": "substack",
-  "license": "MIT"
+  "license": "MIT",
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/substack/appfeed.git"
+  },
+  "keywords": [
+    "application",
+    "feed",
+    "webapp",
+    "signed",
+    "trusted",
+    "log",
+    "hyperlog",
+    "hyperboot",
+    "versions"
+  ],
+  "bugs": {
+    "url": "https://github.com/substack/appfeed/issues"
+  },
+  "homepage": "https://github.com/substack/appfeed#readme"
 }
