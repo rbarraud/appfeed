@@ -74,6 +74,14 @@ module.exports = function (args) {
       if (err) fail(err)
       else console.log(node.key)
     }))
+  } else if (argv._[0] === 'trusted') {
+    var feed = getFeed()
+    feed.trusted(argv._[1], function (err, trusted) {
+      if (err) return fail(err)
+      trusted.forEach(function (id) {
+        console.log(id.toString('hex'))
+      })
+    })
   } else return false
  
   function getFeed () {

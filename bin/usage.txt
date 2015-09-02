@@ -10,6 +10,12 @@ appfeed versions
 
   Print a list of versions with their hashes.
 
+appfeed trusted
+appfeed trusted REF
+
+  Print a list of currently trusted nodes or if a version or hash REF
+  is given, print the list of trusted nodes for REF.
+
 appfeed show REF
 
   Print the contents of REF, a version or hash.

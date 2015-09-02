@@ -90,6 +90,10 @@ Appfeed.prototype.revoke = function (id, cb) {
   this._trust.revoke(id, cb)
 }
 
+Appfeed.prototype.trusted = function (from, cb) {
+  return this._trust.trusted(from, cb)
+}
+
 Appfeed.prototype.publish = function (doc, cb) {
   var self = this
   if (!cb) cb = noop
