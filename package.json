@@ -22,7 +22,12 @@
     "trust-log ": "^1.0.0",
     "xtend": "2.1.2"
   },
-  "scripts": {},
+  "devDependencies": {
+    "tape": "^4.0.0"
+  },
+  "scripts": {
+    "test": "tape test/*.js"
+  },
   "author": "substack",
   "license": "MIT"
 }
