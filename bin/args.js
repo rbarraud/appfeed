@@ -92,6 +92,11 @@ module.exports = function (args) {
     feed.revoke(argv._[1], function (err) {
       if (err) fail(err)
     })
+  } else if (argv._[0] === 'replicate') {
+    var feed = getFeed()
+    process.stdin.pipe(feed.replicate(argv)).pipe(process.stdout)
+  } else if (argv._[0] === '_feed') {
+    return getFeed() // to be used by outside packages
   } else return false
  
   function getFeed () {

@@ -6,6 +6,7 @@ var exchange = require('./exchange.js')
 var sub = require('subleveldown')
 var semver = require('semver')
 var Writable = require('readable-stream/writable')
+var multiplex = require('multiplex')
 
 module.exports = Appfeed
 
@@ -46,11 +47,11 @@ Appfeed.prototype.replicate = function (opts, cb) {
   if (!cb) cb = noop
  
   var mux = multiplex()
-  var tstream = self._trust.replicate()
+  var tstream = self._trust.replicate(opts)
   tstream.pipe(mux.createStream('trust')).pipe(tstream)
 
   tstream.once('finish', function () {
-    var astream = self.versions.replicate()
+    var astream = self.versions.replicate(opts)
     astream.pipe(mux.createStream('versions')).pipe(astream)
     astream.once('finish', function () { fetchApps() })
   })
@@ -75,7 +76,7 @@ Appfeed.prototype.replicate = function (opts, cb) {
   function replicate (keys, cb) {
     var ex = exchange(self.store)
     ex.pipe(mux.createSharedStream('exchange')).pipe(ex)
- 
+
     var pending = 1
     keys.forEach(function (key) {
       pending ++
