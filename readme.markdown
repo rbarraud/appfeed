@@ -90,3 +90,11 @@ latest update if `from` is `null`.
 npm install -g appfeed
 npm install appfeed
 ```
+
+# thanks
+
+Thanks to [blockai](https://blockai.com) for sponsoring this project.
+
+# license
+
+MIT
