@@ -4,7 +4,7 @@ var path = require('path')
 var fs = require('fs')
 
 var argv = minimist(process.argv.slice(2), {
-  default: { dir: path.join(process.cwd(), 'appfeed') },
+  default: { dir: path.join(process.cwd(), '.appfeed') },
   alias: { d: 'dir', v: 'version' }
 })
 if (argv.help || argv._[0] === 'help') return usage(0)
