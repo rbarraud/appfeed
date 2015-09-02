@@ -82,15 +82,15 @@ Appfeed.prototype.revoke = function (id, cb) {
 
 Appfeed.prototype.publish = function (doc, cb) {
   var self = this
-  if (!doc.body) return nextTick(cb, new Error('doc.body not provided'))
-  if (!doc.type) return nextTick(cb, new Error('doc.version not provided'))
-  if (!doc.version) return nextTick(cb, new Error('doc.type not provided'))
-
-  self._store.createWriteStream(function (err, w) {
+  if (!cb) cb = noop
+  if (!doc.version) return nextTick(cb, new Error('doc.version not provided'))
+ 
+  return self._store.createWriteStream(function (err, w) {
+    doc.key = w.key
     self._versions.append(doc, function (err, node) {
-      cb(err)
+      cb(err, node.key)
     })
-  }).end(doc.body)
+  })
 }
 
 function noop () {}

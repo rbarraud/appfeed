@@ -1,0 +1,7 @@
+appfeed publish OPTIONS
+appfeed server OPTIONS
+
+OPTIONS are:
+
+  --dir -d  Where to save the appfeed data
+
