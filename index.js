@@ -3,17 +3,25 @@ var trust = require('trust-log')
 var hsodium = require('hyperlog-sodium')
 var xtend = require('xtend')
 var exchange = require('./exchange.js')
+var sub = require('subleveldown')
 
 module.exports = Appfeed
 
 function Appfeed (db, sodium, opts) {
   var self = this
-  if (!(self instanceof Appfeed)) return new Appfeed(db, opts)
+  if (!(self instanceof Appfeed)) return new Appfeed(db, sodium, opts)
   if (!opts) opts = {}
+  var keypair = {
+    secretKey: typeof opts.secretKey === 'string'
+      ? Buffer(opts.secretKey, 'hex') : opts.secretKey,
+    publicKey: typeof opts.publicKey === 'string'
+      ? Buffer(opts.publicKey, 'hex') : opts.publicKey
+  }
   self._trust = trust(sub(db, 't'), hsodium(sodium, opts, xtend(opts, {
-    publicKey: function (id, cb) { self._trust.isTrusted(id, cb) }
-  }))
-  self._versions = hyperlog(sub(db, 'l', xtend(opts, {
+    publicKey: function (id, cb) { self._trust.isTrusted(id, cb) },
+    id: opts.publicKey
+  })))
+  self.versions = hyperlog(sub(db, 'l'), xtend(opts, {
     valueEncoding: 'json',
     verify: function (node, cb) { self._trust.verify(node, cb) },
     sign: function (node, cb) {
@@ -35,20 +43,20 @@ Appfeed.prototype.replicate = function (opts, cb) {
     tstream.pipe(mux.createStream('trust')).pipe(tstream)
   }
   if (opts.versions !== false) {
-    var astream = self._versions.replicate()
+    var astream = self.versions.replicate()
     astream.pipe(mux.createStream('versions')).pipe(astream)
   }
  
   if (opts.heads) {
     if (astream) astream.once('finish', function () {
-      self._versions.heads(function (err, heads) {
+      self.versions.heads(function (err, heads) {
         if (err) return cb(err)
         else replicate(heads.map(keyof), cb)
       })
     })
   } else if (opts.full !== false) {
     if (astream) astream.once('finish', function () {
-      collect(self._versions.createReadStream(), function (err, rows) {
+      collect(self.versions.createReadStream(), function (err, rows) {
         if (err) cb(err)
         else replicate(rows.map(keyof), cb)
       })
@@ -83,13 +91,14 @@ Appfeed.prototype.revoke = function (id, cb) {
 Appfeed.prototype.publish = function (doc, cb) {
   var self = this
   if (!cb) cb = noop
-  if (!doc.version) return nextTick(cb, new Error('doc.version not provided'))
+  if (!doc.version) throw new Error('doc.version not provided')
+  if (typeof doc.version !== 'string') {
+    throw new Error('doc.version must be a string')
+  }
  
   return self._store.createWriteStream(function (err, w) {
     doc.key = w.key
-    self._versions.append(doc, function (err, node) {
-      cb(err, node.key)
-    })
+    self.versions.append(doc, cb)
   })
 }
 
