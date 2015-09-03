@@ -48,12 +48,14 @@ Appfeed.prototype.replicate = function (opts, cb) {
  
   var mux = multiplex()
   var tstream = self._trust.replicate(opts)
-  tstream.pipe(mux.createStream('trust')).pipe(tstream)
+  tstream.pipe(mux.createSharedStream('trust')).pipe(tstream)
 
   tstream.once('finish', function () {
     var astream = self.versions.replicate(opts)
-    astream.pipe(mux.createStream('versions')).pipe(astream)
-    astream.once('finish', function () { fetchApps() })
+    astream.pipe(mux.createSharedStream('versions')).pipe(astream)
+    astream.once('finish', function () {
+      fetchApps()
+    })
   })
   return mux
 
