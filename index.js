@@ -28,7 +28,10 @@ function Appfeed (db, sodium, opts) {
   })))
   self.versions = hyperlog(sub(db, 'l'), xtend(opts, {
     valueEncoding: 'json',
-    verify: function (node, cb) { self._trust.verify(node, cb) },
+    verify: function (node, cb) {
+      self._trust.verify(node, cb)
+    },
+    identity: keypair.publicKey,
     sign: function (node, cb) {
       var bkey = Buffer(node.key, 'hex')
       cb(null, sodium.crypto_sign(bkey, keypair.secretKey))
