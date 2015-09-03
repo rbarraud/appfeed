@@ -1,6 +1,6 @@
 {
   "name": "appfeed",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "version feed for trusted application delivery",
   "main": "index.js",
   "bin": {
